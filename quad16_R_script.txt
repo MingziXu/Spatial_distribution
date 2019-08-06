@@ -1,0 +1,110 @@
+> quad16<-read.table("quad16.csv",header=T,sep=",")
+> quad16$plot<-as.factor(quad16$plot)
+> 
+> sym<-subset(quad16,quad16$spptype=="sym")
+> c<-subset(quad16,quad16$spp=="c")
+> p<-subset(quad16,quad16$spp=="p")
+> c.sym<-subset(sym,sym$spp=="c")
+> p.sym<-subset(sym,sym$spp=="")
+
+=============================================================
+## Species comparison
+-------------------------------------------------------------
+## pulse rate ##
+> describe(p$meanpr)
+> library(lme4)
+> pr<-lmer(meanpr~spp+(1|plot),data=symam)
+> Anova(pr,type=3)
+
+## pulse duration ##
+
+> sym.dout<-subset(sym,sym$meand>0.018)
+> c.sym.dout<-subset(sym.dout,sym.dout$spp=="c")
+> p.sym.dout<-subset(sym.dout,sym.dout$spp=="p")
+
+> describe(1000*c.sym.dout$meand)
+> describe(1000*p.sym.dout$meand)
+> d<-lmer(meand~spp+(1|plot),data=sym.dout)
+> Anova(d,type=3)
+
+## carrier frequency ##
+
+> sym.lowfout<-subset(sym,sym$meanf>=4200)
+> c.sym.lowfout<-subset(sym.lowfout,sym.lowfout$spp=="c")
+> p.sym.lowfout<-subset(sym.lowfout,sym.lowfout$spp=="p")
+> shapiro.test(c.sym.lowfout$meanf)
+> shapiro.test(p.sym.lowfout$meanf)
+> describe(c.sym.lowfout$meanf)
+> describe(p.sym.lowfout$meanf)
+> freq<-lmer(meanf~spp+(1|plot),data=sym.lowfout)
+> Anova(freq,type=3)
+
+=======================================
+> sym<-subset(quad16,quad16$spptype=="sym")
+> sym.am<-subset(sym,sym$fil==1)
+> c.sym.am<-subset(sym.am,sym.am$spp=="c")
+> p.sym.am<-subset(sym.am,sym.am$spp=="p")
+
+=====================================================================================
+# all males #
+> ra2<-tapply(quad16$projdis,quad16$plot,median)
+> re<-0.5*sqrt(tapply(quad16$area,quad16$plot,mean)/tapply(quad16$id,quad16$plot,length))+(0.051+0.041/sqrt(tapply(quad16$id,quad16$plot,length)))*tapply(quad16$l,quad16$plot,mean)/tapply(quad16$id,quad16$plot,length)
+> ser<-sqrt(0.07*tapply(quad16$area,quad16$plot,mean)+0.037*tapply(quad16$l,quad16$plot,mean)*sqrt(tapply(quad16$area,quad16$plot,mean)/tapply(quad16$id,quad16$plot,length)))/tapply(quad16$id,quad16$plot,length)
+> z2<-(ra2-re)/ser
+> p2
+1          2          	3          	4          5 
+0.20 	<0.00001     <0.00001    0.0008      0.64
+
+# lc only #
+> c.ra2<-tapply(c$projdis,c$plot,median)
+> c.re<-0.5*sqrt(tapply(c$area,c$plot,mean)/tapply(c$id,c$plot,length))+(0.051+0.041/sqrt(tapply(c$id,c$plot,length)))*tapply(c$l,c$plot,mean)/tapply(c$id,c$plot,length)
+> c.ra2/c.re
+> c.ser<-sqrt(0.07*tapply(c$area,c$plot,mean)+0.037*tapply(c$l,c$plot,mean)*sqrt(tapply(c$area,c$plot,mean)/tapply(c$id,c$plot,length)))/tapply(c$id,c$plot,length)
+> c.z2<-(c.ra2-c.re)/c.ser
+
+# lp only #
+> p.ra2<-tapply(p$projdis,p$plot,median)
+> p.re<-0.5*sqrt(tapply(p$area,p$plot,mean)/tapply(p$id,p$plot,length))+(0.051+0.041/sqrt(tapply(p$id,p$plot,length)))*tapply(p$l,p$plot,mean)/tapply(p$id,p$plot,length)
+> p.ra2/p.re
+         1          2          3          4          5 
+        NA 0.25809769 0.06954516 0.26359012 0.76013721 
+> p.ser<-sqrt(0.07*tapply(p$area,p$plot,mean)+0.037*tapply(p$l,p$plot,mean)*sqrt(tapply(p$area,p$plot,mean)/tapply(p$id,p$plot,length)))/tapply(p$id,p$plot,length)
+> p.z2<-(p.ra2-p.re)/p.ser
+> p.z2
+        1         2         3         4         5 
+       NA -5.255830 -2.748660 -3.028749 -1.477204 
+ >p.p
+1         2             	3         	4          5 
+NA  <0.00001	0.006		0.002  0.140
+
+> table(quad16$spp,quad16$plot)
+
+-----------------------------------------------------------------------------
+> table(quad16$spp,quad16$plot)
+> table(c$nntype,c$plot)  
+> table(p$nntype,p$plot)  
+
+> binom.test(7,11,10/27)
+> binom.test(13,17,16/27)
+> binom.test(9,11,10/13)
+> binom.test(0,3,2/13)
+> binom.test(4,7,6/12)
+> binom.test(3,6,5/12)
+
+============================================================================
+> table(sym$on,sym$spp)
+ > chisq.test(c(5,22,0,28))
+
+——————————————————————————————————
+> tapply(sym$height,sym$spp,median)
+> tapply(sym$height,sym$spp,IQR)
+> height<-lmer(log(height+0.001)~spp+(1|plot),data=sym)
+> Anova(height,type=3)
+
+==========================================================================================
+> describe(sym.am$actudis)
+   vars  n mean   sd median trimmed mad  min  max range skew kurtosis   se
+X1    1 55 0.76 0.68   0.48    0.66 0.4 0.12 3.27  3.15 1.66     2.81 0.09
+
+> IQR(sym.am$actudis,na.rm=T)
+[1] 0.66
